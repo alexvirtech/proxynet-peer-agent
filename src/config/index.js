@@ -3,7 +3,7 @@ import { join } from 'path';
 import { randomBytes } from 'crypto';
 import { homedir } from 'os';
 
-const DATA_DIR = join(homedir(), '.proxynet-agent');
+const DATA_DIR = process.env.DATA_DIR || join(homedir(), '.proxynet-agent');
 
 function ensureDataDir() {
   if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
