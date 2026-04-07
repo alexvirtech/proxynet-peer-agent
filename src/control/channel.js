@@ -171,6 +171,8 @@ export class ControlChannel extends EventEmitter {
         region: this.config.region,
         bandwidth_mbps: 100,
         peerId: this.peerId,
+        ownerType: this.config.ownerId === 'system' ? 'system' : 'user',
+        nodeId: this.config.nodeId,
       });
     });
   }
@@ -186,6 +188,8 @@ export class ControlChannel extends EventEmitter {
         health: stats.health,
         bandwidth_mbps: 100,
         region: this.config.region,
+        ownerType: this.config.ownerId === 'system' ? 'system' : 'user',
+        nodeId: this.config.nodeId,
       });
     }, this.config.heartbeatIntervalMs);
   }
