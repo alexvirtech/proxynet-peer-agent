@@ -1,0 +1,27 @@
+[Unit]
+Description=ProxyNet Peer Agent
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=proxynet
+Group=proxynet
+WorkingDirectory=/opt/proxynet-peer-agent
+EnvironmentFile=/opt/proxynet-peer-agent/.env
+ExecStart=/usr/bin/node src/index.js
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=proxynet-peer-agent
+
+# Security hardening
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/opt/proxynet-peer-agent /home/proxynet/.proxynet-agent
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

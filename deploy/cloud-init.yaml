@@ -1,0 +1,28 @@
+#cloud-config
+package_update: true
+packages:
+  - curl
+  - git
+
+runcmd:
+  # Install Node.js 22
+  - curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+  - apt-get install -y nodejs
+
+  # Create app user
+  - useradd -r -m -s /bin/false proxynet || true
+  - mkdir -p /home/proxynet/.proxynet-agent
+  - chown proxynet:proxynet /home/proxynet/.proxynet-agent
+
+  # Clone and install
+  - git clone https://github.com/alexvirtech/proxynet-peer-agent.git /opt/proxynet-peer-agent
+  - cd /opt/proxynet-peer-agent && npm install --production
+  - chown -R proxynet:proxynet /opt/proxynet-peer-agent
+
+  # Configure (env file must be placed via Hetzner user-data or secrets)
+  - cp /opt/proxynet-peer-agent/.env.example /opt/proxynet-peer-agent/.env
+
+  # Install and start systemd service
+  - cp /opt/proxynet-peer-agent/systemd/proxynet-peer-agent.service /etc/systemd/system/
+  - systemctl daemon-reload
+  - systemctl enable --now proxynet-peer-agent
