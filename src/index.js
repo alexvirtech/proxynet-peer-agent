@@ -10,6 +10,7 @@ import { HealthServer } from './metrics/server.js';
 
 const CAPACITY = 10;
 let shutdownInProgress = false;
+let assignedConsumers = 0;
 
 async function main() {
   const config = loadConfig();
@@ -71,9 +72,9 @@ async function main() {
       await channel.registerPeer();
       await channel.joinAggregation(CAPACITY);
 
-      // Start heartbeat
+      // Start heartbeat — report consumer count as load, not tunnel count
       channel.startHeartbeat(() => ({
-        activeSessions: metrics.activeSessions,
+        activeSessions: assignedConsumers,
         capacity: CAPACITY,
         health: healthChecker.health,
       }));
@@ -89,9 +90,11 @@ async function main() {
   });
 
   channel.on('session-incoming', (msg) => {
+    assignedConsumers++;
     log.info('session.incoming', {
       sessionId: msg.session_id,
       consumerId: msg.consumer_user_id,
+      assignedConsumers,
     });
   });
 
